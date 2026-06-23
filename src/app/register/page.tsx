@@ -8,6 +8,7 @@ import styles from '../login/login.module.css';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [inviteCode, setInviteCode] = useState('');
   const [businessName, setBusinessName] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -24,7 +25,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ businessName, name, email, password }),
+        body: JSON.stringify({ businessName, name, email, password, inviteCode: inviteCode.trim().toUpperCase() }),
       });
 
       const data = await res.ok ? await res.json() : null;
@@ -54,12 +55,30 @@ export default function RegisterPage() {
 
           <div className={styles.header}>
             <h1 className={styles.title}>Creá tu negocio</h1>
-            <p className={styles.subtitle}>Comenzá tu prueba gratuita de 14 días en el plan Pro</p>
+            <p className={styles.subtitle}>Ingresá tu código de invitación para comenzar</p>
           </div>
 
           {error && <Alert type="error" message={error} onClose={() => setError(null)} />}
 
           <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="inviteCode">🔑 Código de Invitación</label>
+              <input
+                id="inviteCode"
+                type="text"
+                className="form-input"
+                placeholder="COMERCIO-A3F8-2025"
+                required
+                value={inviteCode}
+                onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                disabled={loading}
+                style={{ fontFamily: 'monospace', letterSpacing: '0.05em', textTransform: 'uppercase' }}
+              />
+              <small style={{ color: 'hsl(var(--muted-foreground, 210 10% 60%))', fontSize: '0.75rem' }}>
+                Pedí tu código al administrador de la plataforma
+              </small>
+            </div>
+
             <div className="form-group">
               <label htmlFor="businessName">Nombre del comercio / negocio</label>
               <input

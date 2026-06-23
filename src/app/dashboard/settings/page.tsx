@@ -21,6 +21,17 @@ interface Employee {
   createdAt: string;
 }
 
+interface InviteCode {
+  id: string;
+  code: string;
+  planType: string;
+  isUsed: boolean;
+  usedBy: string | null;
+  note: string | null;
+  createdAt: string;
+  usedAt: string | null;
+}
+
 export default function SettingsPage() {
   const [configLoading, setConfigLoading] = useState(true);
   const [employeesLoading, setEmployeesLoading] = useState(true);
@@ -43,6 +54,12 @@ export default function SettingsPage() {
 
   // Copias de seguridad
   const [restoring, setRestoring] = useState(false);
+
+  // Códigos de invitación
+  const [inviteCodes, setInviteCodes] = useState<InviteCode[]>([]);
+  const [inviteNote, setInviteNote] = useState('');
+  const [creatingCode, setCreatingCode] = useState(false);
+  const [codesLoading, setCodesLoading] = useState(true);
 
   const fetchConfig = async () => {
     try {
@@ -78,9 +95,24 @@ export default function SettingsPage() {
     }
   };
 
+  const fetchInviteCodes = async () => {
+    try {
+      const res = await fetch('/api/invite-codes');
+      if (res.ok) {
+        const data = await res.json();
+        setInviteCodes(data.codes || []);
+      }
+    } catch (err) {
+      console.error('Error fetching invite codes', err);
+    } finally {
+      setCodesLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchConfig();
     fetchEmployees();
+    fetchInviteCodes();
   }, []);
 
   const handleBizSubmit = async (e: React.FormEvent) => {
@@ -229,6 +261,47 @@ export default function SettingsPage() {
       }
     } catch (err) {
       setAlert({ type: 'error', msg: 'Error al conectar con el servidor' });
+    }
+  };
+
+  const handleCreateInviteCode = async () => {
+    setCreatingCode(true);
+    setAlert(null);
+    try {
+      const res = await fetch('/api/invite-codes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note: inviteNote || null }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setAlert({ type: 'success', msg: `¡Código creado! ${data.inviteCode.code}` });
+        setInviteNote('');
+        fetchInviteCodes();
+      } else {
+        setAlert({ type: 'error', msg: data.error || 'Error al crear código' });
+      }
+    } catch (err) {
+      setAlert({ type: 'error', msg: 'Error de conexión' });
+    } finally {
+      setCreatingCode(false);
+    }
+  };
+
+  const handleDeleteInviteCode = async (id: string, code: string) => {
+    if (!confirm(`¿Eliminar el código ${code}?`)) return;
+    setAlert(null);
+    try {
+      const res = await fetch(`/api/invite-codes?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok) {
+        setAlert({ type: 'success', msg: 'Código eliminado' });
+        fetchInviteCodes();
+      } else {
+        setAlert({ type: 'error', msg: data.error || 'Error al eliminar' });
+      }
+    } catch (err) {
+      setAlert({ type: 'error', msg: 'Error de conexión' });
     }
   };
 
@@ -490,6 +563,88 @@ export default function SettingsPage() {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Panel Códigos de Invitación */}
+          <div className={styles.panel} style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
+            <h3 className={styles.title}>🔑 Códigos de Invitación</h3>
+            <p style={{ fontSize: '0.85rem', color: 'hsl(var(--muted-foreground))', marginBottom: '1.5rem' }}>
+              Generá códigos únicos para que tus clientes puedan registrarse. Cada código solo se puede usar una vez.
+            </p>
+
+            <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+              <div className="form-group" style={{ flex: 1, minWidth: '200px', marginBottom: 0 }}>
+                <label htmlFor="inviteNote">Nota interna (opcional)</label>
+                <input
+                  id="inviteNote"
+                  type="text"
+                  className="form-input"
+                  placeholder="Ej: Para kiosco de Juan"
+                  value={inviteNote}
+                  onChange={(e) => setInviteNote(e.target.value)}
+                  disabled={creatingCode}
+                />
+              </div>
+              <button
+                onClick={handleCreateInviteCode}
+                className="btn btn-primary"
+                style={{ padding: '0.7rem 1.5rem', whiteSpace: 'nowrap' }}
+                disabled={creatingCode}
+              >
+                {creatingCode ? 'Generando...' : '+ Generar Código'}
+              </button>
+            </div>
+
+            {codesLoading ? (
+              <div style={{ fontSize: '0.8rem', color: 'hsl(var(--muted-foreground))' }}>Cargando códigos...</div>
+            ) : inviteCodes.length === 0 ? (
+              <div style={{ fontSize: '0.8rem', color: 'hsl(var(--muted-foreground))' }}>No hay códigos de invitación generados aún.</div>
+            ) : (
+              <table className={styles.employeeTable}>
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Nota</th>
+                    <th>Estado</th>
+                    <th>Usado por</th>
+                    <th style={{ textAlign: 'center' }}>Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {inviteCodes.map((ic) => (
+                    <tr key={ic.id}>
+                      <td style={{ fontFamily: 'monospace', fontWeight: 700, letterSpacing: '0.03em' }}>{ic.code}</td>
+                      <td style={{ fontSize: '0.8rem', color: 'hsl(var(--muted-foreground))' }}>{ic.note || '—'}</td>
+                      <td>
+                        <span style={{
+                          fontWeight: 700,
+                          color: ic.isUsed ? 'hsl(var(--muted-foreground))' : 'hsl(var(--success))',
+                          fontSize: '0.75rem'
+                        }}>
+                          {ic.isUsed ? '✅ Usado' : '🟢 Disponible'}
+                        </span>
+                      </td>
+                      <td style={{ fontSize: '0.8rem' }}>{ic.usedBy || '—'}</td>
+                      <td style={{ textAlign: 'center' }}>
+                        {!ic.isUsed ? (
+                          <button
+                            onClick={() => handleDeleteInviteCode(ic.id, ic.code)}
+                            className="btn btn-secondary"
+                            style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}
+                          >
+                            🗑️ Eliminar
+                          </button>
+                        ) : (
+                          <span style={{ fontSize: '0.7rem', color: 'hsl(var(--muted-foreground))' }}>
+                            {ic.usedAt ? new Date(ic.usedAt).toLocaleDateString('es-AR') : ''}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       )}

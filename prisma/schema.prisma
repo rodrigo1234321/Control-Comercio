@@ -167,3 +167,16 @@ model AccountMovement {
   @@index([tenantId])
   @@index([clientId])
 }
+
+// Códigos de invitación para controlar quién puede registrarse
+model InviteCode {
+  id        String    @id @default(uuid())
+  code      String    @unique
+  planType  String    @default("pro") // Plan que obtiene el invitado
+  isUsed    Boolean   @default(false)
+  usedBy    String?   // Email de quien lo usó
+  note      String?   // Nota interna: "Para kiosco de Juan", etc.
+  createdAt DateTime  @default(now())
+  usedAt    DateTime?
+}
+

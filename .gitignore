@@ -35,3 +35,5 @@ Thumbs.db
 /prisma/test-query.js
 /prisma/test-reports.js
 /prisma/cleanup-fito.js
+
+.vercel

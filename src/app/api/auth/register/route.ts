@@ -8,6 +8,7 @@ const registerSchema = z.object({
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
   email: z.string().email('El correo electrónico no es válido'),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
+  inviteCode: z.string().min(1, 'El código de invitación es obligatorio'),
 });
 
 export async function POST(request: Request) {
@@ -21,7 +22,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: errors }, { status: 400 });
     }
 
-    const { businessName, name, email, password } = result.data;
+    const { businessName, name, email, password, inviteCode } = result.data;
+
+    // Verificar que el código de invitación existe y no fue usado
+    const invite = await db.inviteCode.findUnique({
+      where: { code: inviteCode.trim().toUpperCase() },
+    });
+
+    if (!invite) {
+      return NextResponse.json({ error: 'El código de invitación no es válido' }, { status: 400 });
+    }
+
+    if (invite.isUsed) {
+      return NextResponse.json({ error: 'Este código de invitación ya fue utilizado' }, { status: 400 });
+    }
 
     // Verificar si el correo ya existe
     const existingUser = await db.user.findUnique({
@@ -34,16 +48,16 @@ export async function POST(request: Request) {
 
     const passwordHash = await hashPassword(password);
 
-    // Crear Tenant y Usuario Administrador en una sola transacción
+    // Crear Tenant, Usuario y marcar código como usado en una transacción
     const { user, tenant } = await db.$transaction(async (tx) => {
       // 1. Crear el negocio (Tenant)
       const newTenant = await tx.tenant.create({
         data: {
           name: businessName,
           currency: 'ARS',
-          taxPercentage: 21.0, // IVA estándar en Argentina
+          taxPercentage: 21.0,
           subscriptionStatus: 'active',
-          planType: 'pro', // Plan por defecto en registro directo
+          planType: invite.planType, // Usa el plan del código de invitación
         },
       });
 
@@ -59,13 +73,23 @@ export async function POST(request: Request) {
         },
       });
 
-      // 3. Crear categorías básicas por defecto para ayudar al comercio
+      // 3. Crear categorías básicas por defecto
       await tx.category.createMany({
         data: [
           { tenantId: newTenant.id, name: 'General', description: 'Categoría por defecto' },
           { tenantId: newTenant.id, name: 'Bebidas', description: 'Gaseosas, aguas, jugos' },
           { tenantId: newTenant.id, name: 'Almacén', description: 'Comestibles secos y enlatados' },
         ],
+      });
+
+      // 4. Marcar el código de invitación como usado
+      await tx.inviteCode.update({
+        where: { id: invite.id },
+        data: {
+          isUsed: true,
+          usedBy: email,
+          usedAt: new Date(),
+        },
       });
 
       return { user: newUser, tenant: newTenant };
@@ -111,3 +135,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Ocurrió un error en el servidor al crear la cuenta' }, { status: 500 });
   }
 }
+
