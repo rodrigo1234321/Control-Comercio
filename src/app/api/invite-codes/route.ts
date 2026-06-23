@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { getAuthUser } from '@/lib/auth';
+import { getAuthUser, isSuperAdmin } from '@/lib/auth';
 import crypto from 'crypto';
 
 // Genera un código legible tipo "KIOSCO-A3F8-2024"
@@ -15,8 +15,8 @@ function generateCode(): string {
 export async function GET() {
   try {
     const user = getAuthUser();
-    if (!user || user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    if (!isSuperAdmin(user)) {
+      return NextResponse.json({ error: 'No autorizado. Solo el administrador de la plataforma puede gestionar códigos.' }, { status: 403 });
     }
 
     const codes = await db.inviteCode.findMany({
@@ -34,8 +34,8 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const user = getAuthUser();
-    if (!user || user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    if (!isSuperAdmin(user)) {
+      return NextResponse.json({ error: 'No autorizado. Solo el administrador de la plataforma puede gestionar códigos.' }, { status: 403 });
     }
 
     const body = await request.json().catch(() => ({}));
@@ -63,8 +63,8 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   try {
     const user = getAuthUser();
-    if (!user || user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    if (!isSuperAdmin(user)) {
+      return NextResponse.json({ error: 'No autorizado. Solo el administrador de la plataforma puede gestionar códigos.' }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);

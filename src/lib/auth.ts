@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'control-comercio-super-secret-key-12345678';
 export const AUTH_COOKIE_NAME = 'auth_token';
+export const SUPER_ADMIN_EMAIL = process.env.SUPER_ADMIN_EMAIL || 'admin@comercio.com';
 
 export interface AuthPayload {
   userId: string;
@@ -37,6 +38,12 @@ export function getAuthUser(): AuthPayload | null {
   } catch (error) {
     return null;
   }
+}
+
+// Verifica si el usuario autenticado es el Super Admin de la plataforma
+export function isSuperAdmin(user: AuthPayload | null): boolean {
+  if (!user) return false;
+  return user.role === 'ADMIN' && user.email === SUPER_ADMIN_EMAIL;
 }
 
 // Encripta una contraseña

@@ -61,6 +61,9 @@ export default function SettingsPage() {
   const [creatingCode, setCreatingCode] = useState(false);
   const [codesLoading, setCodesLoading] = useState(true);
 
+  // Super Admin
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
   const fetchConfig = async () => {
     try {
       const res = await fetch('/api/config');
@@ -112,7 +115,15 @@ export default function SettingsPage() {
   useEffect(() => {
     fetchConfig();
     fetchEmployees();
-    fetchInviteCodes();
+    // Check if user is super admin
+    fetch('/api/auth/me').then(r => r.json()).then(data => {
+      if (data.isSuperAdmin) {
+        setIsSuperAdmin(true);
+        fetchInviteCodes();
+      } else {
+        setCodesLoading(false);
+      }
+    }).catch(() => setCodesLoading(false));
   }, []);
 
   const handleBizSubmit = async (e: React.FormEvent) => {
@@ -565,7 +576,8 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Panel Códigos de Invitación */}
+          {/* Panel Códigos de Invitación - Solo visible para Super Admin */}
+          {isSuperAdmin && (
           <div className={styles.panel} style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
             <h3 className={styles.title}>🔑 Códigos de Invitación</h3>
             <p style={{ fontSize: '0.85rem', color: 'hsl(var(--muted-foreground))', marginBottom: '1.5rem' }}>
@@ -646,6 +658,7 @@ export default function SettingsPage() {
               </table>
             )}
           </div>
+          )}
         </div>
       )}
     </div>
