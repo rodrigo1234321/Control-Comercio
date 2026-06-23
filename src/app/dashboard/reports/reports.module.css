@@ -1,0 +1,83 @@
+.gridCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.card {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.cardLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: hsl(var(--muted-foreground));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.cardValue {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 0.25rem;
+}
+
+.cardSub {
+  font-size: 0.75rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.gridTables {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.tableCard {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+}
+
+.tableTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  text-align: left;
+}
+
+.table th {
+  padding: 0.75rem 1rem;
+  background-color: hsl(var(--secondary) / 0.5);
+  font-weight: 700;
+  color: hsl(var(--muted-foreground));
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.table td {
+  padding: 1rem;
+  border-bottom: 1px solid hsl(var(--border));
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background-color: hsl(var(--secondary) / 0.2);
+}

@@ -1,0 +1,174 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Para usar con PostgreSQL en producción, cambiar a:
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Tenant {
+  id                 String          @id @default(uuid())
+  name               String
+  logoUrl            String?
+  currency           String          @default("ARS") // pesos argentinos por defecto
+  taxPercentage      Float           @default(21.0)   // IVA 21% por defecto en Argentina
+  cuit               String?         // CUIT del negocio
+  subscriptionStatus String          @default("active") // active, past_due, canceled
+  planType           String          @default("pro")    // basic, pro, premium
+  allowNegativeStock Boolean         @default(false)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  users              User[]
+  categories         Category[]
+  products           Product[]
+  clients            Client[]
+  sales              Sale[]
+  stockMovements     StockMovement[]
+  accountMovements   AccountMovement[]
+}
+
+model User {
+  id             String          @id @default(uuid())
+  tenantId       String
+  tenant         Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name           String
+  email          String          @unique
+  passwordHash   String
+  role           String          @default("EMPLOYEE") // ADMIN | EMPLOYEE
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  sales          Sale[]
+  stockMovements StockMovement[]
+
+  @@index([tenantId])
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  tenantId    String
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([tenantId])
+}
+
+model Product {
+  id             String          @id @default(uuid())
+  tenantId       String
+  tenant         Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  categoryId     String?
+  category       Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  code           String          // Código de barras o SKU
+  name           String
+  description    String?
+  purchasePrice  Float           // Precio de costo
+  salePrice      Float           // Precio de venta al público
+  stock          Int             @default(0)
+  minStock       Int             @default(5)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  stockMovements StockMovement[]
+  saleItems      SaleItem[]
+
+  @@index([tenantId])
+  @@index([code])
+}
+
+model StockMovement {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // IN | OUT | ADJUSTMENT
+  quantity  Int
+  reason    String?  // Compra, Venta, Pérdida, Corrección, etc.
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([productId])
+}
+
+model Client {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name      String
+  email     String?
+  phone     String?
+  cuitCuil  String?  // CUIT/CUIL para facturas en Argentina
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  sales            Sale[]
+  accountMovements AccountMovement[]
+
+  @@index([tenantId])
+}
+
+model Sale {
+  id            String     @id @default(uuid())
+  tenantId      String
+  tenant        Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  clientId      String?
+  client        Client?    @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  userId        String
+  user          User       @relation(fields: [userId], references: [id])
+  totalAmount   Float
+  taxAmount     Float
+  paymentMethod    String            @default("CASH") // CASH | DEBIT | CREDIT | TRANSFER
+  createdAt        DateTime          @default(now())
+  items            SaleItem[]
+  accountMovements AccountMovement[]
+
+  @@index([tenantId])
+  @@index([clientId])
+}
+
+model SaleItem {
+  id        String  @id @default(uuid())
+  saleId    String
+  sale      Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  unitPrice Float
+  subtotal  Float
+
+  @@index([saleId])
+  @@index([productId])
+}
+
+model AccountMovement {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  type      String   // DEBT (deuda) | PAYMENT (pago)
+  amount    Float
+  note      String?
+  saleId    String?  // Opcional enlace a la venta
+  sale      Sale?    @relation(fields: [saleId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([clientId])
+}

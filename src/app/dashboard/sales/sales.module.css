@@ -1,0 +1,216 @@
+.posContainer {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .posContainer {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ticketCard {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  min-height: 500px;
+}
+
+.searchSection {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.searchResults {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  z-index: 10;
+  max-height: 250px;
+  overflow-y: auto;
+  margin-top: 0.25rem;
+}
+
+.searchResultItem {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid hsl(var(--border) / 0.5);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color var(--transition-fast);
+}
+
+.searchResultItem:hover {
+  background-color: hsl(var(--secondary));
+}
+
+.cartList {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  overflow-y: auto;
+  max-height: 350px;
+}
+
+.cartItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: hsl(var(--secondary) / 0.5);
+  border: 1px solid hsl(var(--border) / 0.5);
+  border-radius: 8px;
+}
+
+.cartItemInfo {
+  display: flex;
+  flex-direction: column;
+  max-width: 50%;
+}
+
+.cartItemName {
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.cartItemPrice {
+  font-size: 0.75rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.cartItemActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.qtyBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  transition: all var(--transition-fast);
+}
+
+.qtyBtn:hover {
+  background-color: hsl(var(--secondary));
+}
+
+.qtyValue {
+  font-weight: 700;
+  font-size: 0.875rem;
+  width: 20px;
+  text-align: center;
+}
+
+.removeBtn {
+  color: hsl(var(--destructive));
+  font-size: 1rem;
+  padding: 0.25rem;
+  border-radius: 4px;
+}
+
+.removeBtn:hover {
+  background-color: hsl(var(--destructive) / 0.1);
+}
+
+/* Panel de Pago y Cierre */
+.checkoutPanel {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.summaryTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  padding-top: 1rem;
+  border-top: 2px dashed hsl(var(--border));
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: hsl(var(--primary));
+}
+
+.paymentGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.paymentOption {
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.paymentOption:hover {
+  background-color: hsl(var(--secondary));
+}
+
+.paymentActive {
+  border-color: hsl(var(--primary));
+  background-color: hsl(var(--primary) / 0.05);
+  color: hsl(var(--primary));
+}
+
+.paymentIcon {
+  font-size: 1.25rem;
+}
+
+/* Ventas Recientes */
+.recentSalesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.recentSaleItem {
+  padding: 0.75rem;
+  border-bottom: 1px solid hsl(var(--border) / 0.5);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+}

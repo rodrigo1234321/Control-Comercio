@@ -1,0 +1,94 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1.5rem;
+  background: radial-gradient(circle at 10% 20%, hsl(262, 83%, 58%, 0.15) 0%, transparent 40%),
+              radial-gradient(circle at 90% 80%, hsl(262, 83%, 58%, 0.1) 0%, transparent 40%),
+              hsl(var(--background));
+  transition: background-color var(--transition-normal);
+}
+
+.container {
+  width: 100%;
+  max-width: 440px;
+  animation: slideUp var(--transition-normal) forwards;
+}
+
+.card {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: calc(var(--radius) * 1.5);
+  padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.logo {
+  width: 38px;
+  height: 38px;
+  background-color: hsl(var(--primary));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 800;
+  font-size: 1.5rem;
+}
+
+.brandName {
+  font-weight: 800;
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.7));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  color: hsl(var(--foreground));
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.linkText {
+  color: hsl(var(--primary));
+  font-weight: 600;
+  transition: text-decoration var(--transition-fast);
+}
+
+.linkText:hover {
+  text-decoration: underline;
+}
+
+.footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

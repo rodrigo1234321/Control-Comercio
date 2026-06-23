@@ -1,0 +1,157 @@
+.gridMetrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.metricCard {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.metricHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.metricTitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: hsl(var(--muted-foreground));
+}
+
+.metricIcon {
+  width: 24px;
+  height: 24px;
+  color: hsl(var(--primary));
+  opacity: 0.8;
+}
+
+.metricValue {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: hsl(var(--foreground));
+  line-height: 1.1;
+  margin-bottom: 0.25rem;
+}
+
+.metricSubtext {
+  font-size: 0.75rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.gridContent {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 1024px) {
+  .gridContent {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sectionCard {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+  color: hsl(var(--foreground));
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Tablas y listas simplificadas del dashboard */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background-color: hsl(var(--secondary) / 0.5);
+  border: 1px solid hsl(var(--border) / 0.5);
+  border-radius: 8px;
+}
+
+.itemInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.itemName {
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.itemSub {
+  font-size: 0.75rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.itemBadge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.badgeDanger {
+  background-color: hsl(var(--destructive) / 0.1);
+  color: hsl(var(--destructive));
+}
+
+.badgeSuccess {
+  background-color: hsl(var(--success) / 0.1);
+  color: hsl(var(--success));
+}
+
+/* Gráfico SVG */
+.chartContainer {
+  width: 100%;
+  height: 250px;
+  position: relative;
+  margin-top: 1rem;
+}
+
+.svgChart {
+  width: 100%;
+  height: 100%;
+}
+
+.tooltip {
+  position: absolute;
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+}

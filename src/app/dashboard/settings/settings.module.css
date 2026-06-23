@@ -1,0 +1,61 @@
+.settingsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .settingsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: hsl(var(--foreground));
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid hsl(var(--border));
+  padding-bottom: 0.75rem;
+}
+
+.sectionHeader {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: hsl(var(--muted-foreground));
+  margin-bottom: 0.75rem;
+}
+
+.employeeTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.8rem;
+}
+
+.employeeTable th {
+  padding: 0.5rem 0.75rem;
+  background-color: hsl(var(--secondary));
+  text-align: left;
+  font-weight: 700;
+  color: hsl(var(--muted-foreground));
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.employeeTable td {
+  padding: 0.75rem;
+  border-bottom: 1px solid hsl(var(--border));
+}

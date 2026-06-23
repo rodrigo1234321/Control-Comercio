@@ -1,0 +1,155 @@
+.actionsBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.filters {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.searchWrapper {
+  position: relative;
+  max-width: 320px;
+  width: 100%;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.65rem 1rem 0.65rem 2.25rem;
+  border-radius: var(--radius);
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--card));
+  font-size: 0.875rem;
+  transition: all var(--transition-fast);
+}
+
+.searchInput:focus {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 2px hsl(var(--primary) / 0.15);
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: hsl(var(--muted-foreground));
+}
+
+.selectInput {
+  padding: 0.65rem 1.5rem 0.65rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--card));
+  font-size: 0.875rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.tableWrapper {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  overflow-x: auto;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.table th {
+  padding: 1rem 1.5rem;
+  background-color: hsl(var(--secondary) / 0.7);
+  font-weight: 700;
+  color: hsl(var(--muted-foreground));
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid hsl(var(--border));
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background-color: hsl(var(--secondary) / 0.2);
+}
+
+.codeBadge {
+  font-family: monospace;
+  background-color: hsl(var(--secondary));
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.stockBadge {
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  display: inline-block;
+}
+
+.stockLow {
+  background-color: hsl(var(--destructive) / 0.1);
+  color: hsl(var(--destructive));
+}
+
+.stockOk {
+  background-color: hsl(var(--success) / 0.1);
+  color: hsl(var(--success));
+}
+
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.iconBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.editBtn {
+  color: hsl(var(--primary));
+}
+
+.editBtn:hover {
+  background-color: hsl(var(--primary) / 0.1);
+}
+
+.deleteBtn {
+  color: hsl(var(--destructive));
+}
+
+.deleteBtn:hover {
+  background-color: hsl(var(--destructive) / 0.1);
+}
+
+.stockLogBtn {
+  color: hsl(var(--warning));
+}
+
+.stockLogBtn:hover {
+  background-color: hsl(var(--warning) / 0.1);
+}

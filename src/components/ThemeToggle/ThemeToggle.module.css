@@ -1,0 +1,27 @@
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius);
+  background-color: hsl(var(--secondary));
+  border: 1px solid hsl(var(--border));
+  color: hsl(var(--foreground));
+  transition: all var(--transition-fast);
+}
+
+.toggleBtn:hover {
+  background-color: hsl(var(--accent));
+  transform: scale(1.05);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  transition: transform var(--transition-normal);
+}
+
+.toggleBtn:active .icon {
+  transform: rotate(45deg) scale(0.9);
+}
