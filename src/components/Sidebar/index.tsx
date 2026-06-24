@@ -26,7 +26,11 @@ export default function Sidebar({ isOpen, onClose }: { isOpen?: boolean; onClose
           const data = await res.json();
           setUser(data);
         } else {
-          router.push('/login');
+          if (res.status === 403) {
+            router.push('/login?suspended=true');
+          } else {
+            router.push('/login');
+          }
         }
       } catch (err) {
         console.error('Error fetching user info', err);

@@ -64,6 +64,19 @@ export default function SettingsPage() {
   // Super Admin
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
+  // Gestión de Comercios (Super Admin)
+  interface Tenant {
+    id: string;
+    name: string;
+    subscriptionStatus: string;
+    createdAt: string;
+    ownerName: string;
+    ownerEmail: string;
+  }
+  const [tenants, setTenants] = useState<Tenant[]>([]);
+  const [tenantsLoading, setTenantsLoading] = useState(true);
+  const [togglingTenant, setTogglingTenant] = useState<string | null>(null);
+
   const fetchConfig = async () => {
     try {
       const res = await fetch('/api/config');
@@ -112,6 +125,61 @@ export default function SettingsPage() {
     }
   };
 
+  const fetchTenants = async () => {
+    try {
+      const res = await fetch('/api/super-admin/tenants');
+      if (res.ok) {
+        const data = await res.json();
+        setTenants(data.tenants || []);
+      }
+    } catch (err) {
+      console.error('Error fetching tenants', err);
+    } finally {
+      setTenantsLoading(false);
+    }
+  };
+
+  const handleToggleTenant = async (id: string, currentStatus: string) => {
+    const isSuspending = currentStatus === 'active';
+    const confirmMsg = isSuspending
+      ? '⚠️ ¿Estás seguro de SUSPENDER este comercio? Todos los usuarios asociados perderán el acceso al sistema de forma inmediata.'
+      : '¿Estás seguro de HABILITAR este comercio nuevamente?';
+
+    if (!confirm(confirmMsg)) return;
+
+    setTogglingTenant(id);
+    setAlert(null);
+
+    try {
+      const res = await fetch('/api/super-admin/tenants', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id,
+          status: isSuspending ? 'suspended' : 'active',
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setAlert({
+          type: 'success',
+          msg: isSuspending
+            ? 'El comercio ha sido suspendido correctamente.'
+            : 'El comercio ha sido habilitado correctamente.',
+        });
+        fetchTenants();
+      } else {
+        setAlert({ type: 'error', msg: data.error || 'Error al cambiar el estado del comercio' });
+      }
+    } catch (err) {
+      setAlert({ type: 'error', msg: 'Error de conexión con el servidor' });
+    } finally {
+      setTogglingTenant(null);
+    }
+  };
+
   useEffect(() => {
     fetchConfig();
     fetchEmployees();
@@ -120,10 +188,15 @@ export default function SettingsPage() {
       if (data.isSuperAdmin) {
         setIsSuperAdmin(true);
         fetchInviteCodes();
+        fetchTenants();
       } else {
         setCodesLoading(false);
+        setTenantsLoading(false);
       }
-    }).catch(() => setCodesLoading(false));
+    }).catch(() => {
+      setCodesLoading(false);
+      setTenantsLoading(false);
+    });
   }, []);
 
   const handleBizSubmit = async (e: React.FormEvent) => {
@@ -651,6 +724,76 @@ export default function SettingsPage() {
                             {ic.usedAt ? new Date(ic.usedAt).toLocaleDateString('es-AR') : ''}
                           </span>
                         )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+          )}
+
+          {/* Panel Gestión de Comercios - Solo visible para Super Admin */}
+          {isSuperAdmin && (
+          <div className={styles.panel} style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
+            <h3 className={styles.title}>🏢 Gestión de Comercios y Cuentas</h3>
+            <p style={{ fontSize: '0.85rem', color: 'hsl(var(--muted-foreground))', marginBottom: '1.5rem' }}>
+              Listado completo de todos los negocios registrados en la plataforma. Podés suspender o rehabilitar el acceso a cualquiera de ellos.
+            </p>
+
+            {tenantsLoading ? (
+              <div style={{ fontSize: '0.8rem', color: 'hsl(var(--muted-foreground))' }}>Cargando comercios...</div>
+            ) : tenants.length === 0 ? (
+              <div style={{ fontSize: '0.8rem', color: 'hsl(var(--muted-foreground))' }}>No hay comercios registrados en el sistema.</div>
+            ) : (
+              <table className={styles.employeeTable}>
+                <thead>
+                  <tr>
+                    <th>Comercio</th>
+                    <th>Administrador Principal</th>
+                    <th>Email</th>
+                    <th>Fecha Registro</th>
+                    <th>Estado</th>
+                    <th style={{ textAlign: 'center' }}>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tenants.map((t) => (
+                    <tr key={t.id}>
+                      <td style={{ fontWeight: 700 }}>{t.name}</td>
+                      <td>{t.ownerName}</td>
+                      <td style={{ fontSize: '0.85rem' }}>{t.ownerEmail}</td>
+                      <td style={{ fontSize: '0.85rem' }}>
+                        {new Date(t.createdAt).toLocaleDateString('es-AR')}
+                      </td>
+                      <td>
+                        <span style={{
+                          fontWeight: 700,
+                          color: t.subscriptionStatus === 'active' || t.subscriptionStatus === 'trialing'
+                            ? 'hsl(var(--success))'
+                            : 'hsl(var(--destructive))',
+                          fontSize: '0.75rem'
+                        }}>
+                          {t.subscriptionStatus === 'active' || t.subscriptionStatus === 'trialing' ? '🟢 Activo' : '🔴 Suspendido'}
+                        </span>
+                      </td>
+                      <td style={{ textAlign: 'center' }}>
+                        <button
+                          onClick={() => handleToggleTenant(t.id, t.subscriptionStatus)}
+                          disabled={togglingTenant === t.id}
+                          className={t.subscriptionStatus === 'active' || t.subscriptionStatus === 'trialing' ? 'btn btn-secondary' : 'btn btn-primary'}
+                          style={{
+                            padding: '0.25rem 0.6rem',
+                            fontSize: '0.75rem',
+                            minWidth: '130px'
+                          }}
+                        >
+                          {togglingTenant === t.id
+                            ? 'Procesando...'
+                            : t.subscriptionStatus === 'active' || t.subscriptionStatus === 'trialing'
+                              ? '🚫 Suspender Acceso'
+                              : '✅ Habilitar Acceso'}
+                        </button>
                       </td>
                     </tr>
                   ))}
